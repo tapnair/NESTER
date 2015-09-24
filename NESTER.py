@@ -74,7 +74,6 @@ class NesterInputChangedHandler(adsk.core.InputChangedEventHandler):
             cmd = args.firingEvent.sender
             inputs = cmd.commandInputs
 
-
         except:
             if ui:
                 ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
@@ -110,7 +109,8 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
             
             for select in objects:
                 createJoint(select, plane[0])
-                
+            ui.messageBox('made joints')
+
             for select in objects:
                 
                 # Problem with Bounding Box Logic
@@ -121,9 +121,15 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                 
                 # Create a transform to do move
                 vector = adsk.core.Vector3D.create(0.0, movement, 0.0)
-                transform = adsk.core.Matrix3D.create()
-                transform.translation = vector
+                transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
+                newTransform = adsk.core.Matrix3D.create()
+                newTransform.translation = vector
+                transform.transformBy(newTransform)
                 
+                # Create a transform to do move
+                # transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
+                # transform.setCell(0,3,movement)
+               
                 # Transform Component
                 select.assemblyContext.transform = transform
                 
