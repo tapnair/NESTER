@@ -12,24 +12,7 @@ commandDescription = 'Apply an appearance to selected bodies or occurrences'
 # global set of event handlers to keep them referenced for the duration of the command
 handlers = []
 appearancesMap = {}
-        
-def clearAllItems(cmdInput):
-    cmdInput.listItems.add('None', True, '')
-    while cmdInput.listItems.count > 1:
-        if cmdInput.listItems[0].name != 'None':
-            cmdInput.listItems[0].deleteMe()
-        else:
-            cmdInput.listItems[1].deleteMe()
             
-def replaceItems(cmdInput, newItems):
-    clearAllItems(cmdInput)
-    if len(newItems) > 0:
-        for item in newItems:
-            cmdInput.listItems.add(item, False, '')
-        cmdInput.listItems[1].isSelected = True
-        cmdInput.listItems[0].deleteMe()
-
-    
 def getSelectedObjects(selectionInput):
     objects = []
     for i in range(0, selectionInput.selectionCount):
@@ -41,10 +24,6 @@ def getSelectedObjects(selectionInput):
            objects.append(selectedObj)
     return objects
 
-def applyAppearanceToObjects(appearance, objects):
-    for obj in objects:
-        obj.appearance = appearance
-        
 def createJoint(face1, face2):
     product = app.activeProduct
     design = adsk.fusion.Design.cast(product)
@@ -64,7 +43,7 @@ def createJoint(face1, face2):
 
     
     # Create the joint
-    joint = joints.add(jointInput)
+    joints.add(jointInput)
         
 class NesterInputChangedHandler(adsk.core.InputChangedEventHandler):
     def __init__(self):
@@ -101,16 +80,14 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
             if not objects or len(objects) == 0:
                 return
             
-            product = app.activeProduct
-            design = adsk.fusion.Design.cast(product)
-    
+            # Set initial Movement
             movement = 0.0
             
-            
+            # Apply Joints 
             for select in objects:
                 createJoint(select, plane[0])
-            ui.messageBox('made joints')
-
+            
+            # Do translations
             for select in objects:
                 
                 # Problem with Bounding Box Logic
@@ -120,12 +97,14 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                 # movement += delta                
                 
                 # Create a transform to do move
+                # TODO Add support for picking a direction
                 vector = adsk.core.Vector3D.create(0.0, movement, 0.0)
                 transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
                 newTransform = adsk.core.Matrix3D.create()
                 newTransform.translation = vector
                 transform.transformBy(newTransform)
                 
+                # Brians method, simpler
                 # Create a transform to do move
                 # transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
                 # transform.setCell(0,3,movement)
@@ -138,6 +117,8 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                 
             # Snapshots are currently not working
             # Would update this and uncomment if bug is fixed
+            # product = app.activeProduct
+            # design = adsk.fusion.Design.cast(product)
             # mysnapshots = design.snapshots
             # mysnapshots.add()
             
