@@ -167,7 +167,12 @@ class NesterCreatedHandler(adsk.core.CommandCreatedEventHandler):
             selectionInput.setSelectionLimits(0)
             selectionInput.addSelectionFilter('PlanarFaces')
             
-            spacingInput = inputs.addValueInput(commandId + '_spacing', 'Component Spacing', 'in', adsk.core.ValueInput.createByReal(2.54))        
+            product = app.activeProduct
+            design = adsk.fusion.Design.cast(product)
+            unitsMgr = design.unitsManager
+            spacingInput = inputs.addValueInput(commandId + '_spacing', 'Component Spacing', 
+                                                unitsMgr.defaultLengthUnits, 
+                                                adsk.core.ValueInput.createByReal(2.54))        
             
         except:
             if ui:
