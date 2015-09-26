@@ -74,9 +74,11 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                     planeInput = inputI
                 elif inputI.id == commandId + '_spacing':
                     spacingInput = inputI
-            
+                elif inputI.id == commandId + '_edge':
+                    edgeInput = inputI
             objects = getSelectedObjects(selectionInput)
             plane = getSelectedObjects(planeInput)
+            edge = adsk.fusion.BRepEdge.cast(edgeInput.selection(0).entity)
             if not objects or len(objects) == 0:
                 return
             
@@ -96,9 +98,15 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                 #        - select.assemblyContext.component.bRepBodies[0].boundingBox.minPoint.y       
                 # movement += delta                
                 
+                # Set up a vector based on input edge
+                (returnValue, startPoint, endPoint) = edge.geometry.evaluator.getEndPoints()              
+                vector = adsk.core.Vector3D.create(endPoint.x - startPoint.x, 
+                                                   endPoint.y - startPoint.y, 
+                                                   endPoint.z - startPoint.z )
+                vector.normalize()
+                vector.scaleBy(movement)
+                
                 # Create a transform to do move
-                # TODO Add support for picking a direction
-                vector = adsk.core.Vector3D.create(0.0, movement, 0.0)
                 transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
                 newTransform = adsk.core.Matrix3D.create()
                 newTransform.translation = vector
@@ -166,6 +174,10 @@ class NesterCreatedHandler(adsk.core.CommandCreatedEventHandler):
             selectionInput = inputs.addSelectionInput(commandId + '_selection', 'Select other faces', 'Select bodies or occurrences')
             selectionInput.setSelectionLimits(0)
             selectionInput.addSelectionFilter('PlanarFaces')
+            
+            selectionEdgeInput = inputs.addSelectionInput(commandId + '_edge', 'Select Direction (edge)', 'Select an edge to define spacing direction')
+            selectionEdgeInput.setSelectionLimits(0)
+            selectionEdgeInput.addSelectionFilter('LinearEdges')
             
             product = app.activeProduct
             design = adsk.fusion.Design.cast(product)
