@@ -27,23 +27,36 @@ def getSelectedObjects(selectionInput):
 def createJoint(face1, face2):
     product = app.activeProduct
     design = adsk.fusion.Design.cast(product)
-
     # Get the root component of the active design
     rootComp = design.rootComponent# Create the first joint geometry with the end face
-    geo0 = adsk.fusion.JointGeometry.createByPlanarFace(face1, None, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)
     
-    # Create the second joint geometry with the sketch line
-    geo1 = adsk.fusion.JointGeometry.createByPlanarFace(face2, None, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)
+    if face1.assemblyContext == face2.assemblyContext:
+        ui.messageBox("Faces are from the same Component.  Each part must be a component")
+        adsk.terminate()
     
-    # Create joint input
-    joints = rootComp.joints
-    jointInput = joints.createInput(geo0, geo1)
-    
-    jointInput.setAsPlanarJointMotion(adsk.fusion.JointDirections.ZAxisJointDirection)
+    elif not face2.assemblyContext:
+        ui.messageBox("Face is from the root component.  Each part must be a component")
+        adsk.terminate()
 
+    elif not face1.assemblyContext:
+        ui.messageBox("Face is from the root component.  Each part must be a component")
+        adsk.terminate()
     
-    # Create the joint
-    joints.add(jointInput)
+    else:
+        geo0 = adsk.fusion.JointGeometry.createByPlanarFace(face1, None, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)
+        
+        # Create the second joint geometry with the sketch line
+        geo1 = adsk.fusion.JointGeometry.createByPlanarFace(face2, None, adsk.fusion.JointKeyPointTypes.CenterKeyPoint)
+        
+        # Create joint input
+        joints = rootComp.joints
+        jointInput = joints.createInput(geo0, geo1)
+        
+        jointInput.setAsPlanarJointMotion(adsk.fusion.JointDirections.ZAxisJointDirection)
+    
+        
+        # Create the joint
+        joints.add(jointInput)
         
 class NesterInputChangedHandler(adsk.core.InputChangedEventHandler):
     def __init__(self):
@@ -76,9 +89,11 @@ class NesterExecuteHandler(adsk.core.CommandEventHandler):
                     spacingInput = inputI
                 elif inputI.id == commandId + '_edge':
                     edgeInput = inputI
+            
             objects = getSelectedObjects(selectionInput)
             plane = getSelectedObjects(planeInput)
-            edge = adsk.fusion.BRepEdge.cast(edgeInput.selection(0).entity)
+            edge = adsk.fusion.BRepEdge.cast(edgeInput.selection(0).entity)    
+            
             if not objects or len(objects) == 0:
                 return
             
@@ -168,15 +183,15 @@ class NesterCreatedHandler(adsk.core.CommandCreatedEventHandler):
             inputs = cmd.commandInputs
             global commandId
             selectionPlaneInput = inputs.addSelectionInput(commandId + '_plane', 'Select Base Face', 'Select Face to mate to')
-            selectionPlaneInput.setSelectionLimits(1)
+            selectionPlaneInput.setSelectionLimits(1,1)
             selectionPlaneInput.addSelectionFilter('PlanarFaces')
             
             selectionInput = inputs.addSelectionInput(commandId + '_selection', 'Select other faces', 'Select bodies or occurrences')
-            selectionInput.setSelectionLimits(0)
+            selectionInput.setSelectionLimits(1,0)
             selectionInput.addSelectionFilter('PlanarFaces')
             
             selectionEdgeInput = inputs.addSelectionInput(commandId + '_edge', 'Select Direction (edge)', 'Select an edge to define spacing direction')
-            selectionEdgeInput.setSelectionLimits(0)
+            selectionEdgeInput.setSelectionLimits(1,1)
             selectionEdgeInput.addSelectionFilter('LinearEdges')
             
             product = app.activeProduct
