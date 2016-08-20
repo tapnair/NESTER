@@ -1,6 +1,6 @@
 # NESTER
 Simple script to lay parts out flat in Fusion 360.  This is not an "official" app, rather something I have been working on as a hobby.
-It is specifically useful for use with a CNC Router.  
+It is specifically useful for use with a CNC Router, Laser Cutter, or other 2D manufacturing techniques.
 I use it to take all of the parts in a design and ley them out flat.
 
 ![Nester Cover](./Nester_Cover.png)
