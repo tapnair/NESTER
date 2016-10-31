@@ -193,7 +193,7 @@ def arrangeComponents(objects, plane, edge, spacing):
 #    mysnapshots = design.snapshots
 #    mysnapshots.add()
     
-class f360NesterCommand(Fusion360CommandBase.Fusion360CommandBase):
+class NesterCommand(Fusion360CommandBase.Fusion360CommandBase):
     def onPreview(self, command, inputs):
         pass
     def onDestroy(self, command, inputs, reason_):    
