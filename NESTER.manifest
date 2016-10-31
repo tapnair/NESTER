@@ -1,9 +1,13 @@
 {
 	"autodeskProduct":	"Fusion360",
-	"type":	"script",
+	"type":	"addin",
+	"id":	"3b330997-dbbb-4cfa-8050-5ea0685a73a6",
 	"author":	"Patrick Rainsberry",
 	"description":	{
-		"":	""
+		"":	"Base Class for a Fusion Addin"
 	},
-	"supportedOS":	"windows|mac"
+	"version":	"",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
 }
