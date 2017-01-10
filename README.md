@@ -21,5 +21,5 @@ Samples are licensed under the terms of the [MIT License](http://opensource.org/
 
 Written by Patrick Rainsberry <br /> (Autodesk Fusion 360 Business Development)
 
-[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Fproject-imas%2Fapp-password&_u=MAC~&cid=1757014354.1393964045&tid=UA-XTZ530-2)]()
+[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Ftapnair%2FNESTER&&tid=UA-41076924-2)]()
 
