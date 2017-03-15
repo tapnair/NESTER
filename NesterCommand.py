@@ -26,21 +26,24 @@ def getInputs(command, inputs):
             planeInput = inputI
         elif inputI.id == command.parentCommandDefinition.id + '_spacing':
             spacingInput = inputI
+            spacing = spacingInput.value
         elif inputI.id == command.parentCommandDefinition.id + '_edge':
             edgeInput = inputI
         elif inputI.id == command.parentCommandDefinition.id + '_subAssy':
             subAssyInput = inputI
+            subAssy = subAssyInput.value
 
     objects = getSelectedObjects(selectionInput)
     plane = getSelectedObjects(planeInput)[0]
     edge = adsk.fusion.BRepEdge.cast(edgeInput.selection(0).entity)
-    spacing = spacingInput.value
-    subAssy = subAssyInput.value
 
     if not objects or len(objects) == 0:
         # TODO this probably requires much better error handling
         return
-    return(objects, plane, edge, spacing, subAssy)
+    # return(objects, plane, edge, spacing, subAssy)
+
+    return (objects, plane, edge, spacing)
+
 
 # Creates a linked copy of all components in a new Sub Assembly
 def createSubAssy(objects):
@@ -203,13 +206,15 @@ class NesterCommand(Fusion360CommandBase.Fusion360CommandBase):
     def onExecute(self, command, inputs):
 
         # Get Input values
-        (objects, plane, edge, spacing, subAssy) = getInputs(command, inputs)
+        # (objects, plane, edge, spacing, subAssy) = getInputs(command, inputs)
+        (objects, plane, edge, spacing) = getInputs(command, inputs)
 
-        # Create Sub-assembly
-        if subAssy:
-            newFaces = createSubAssy(objects)
-        else:
-            newFaces = objects
+        # # Create Sub-assembly
+        # if subAssy:
+        #     newFaces = createSubAssy(objects)
+        # else:
+
+        newFaces = objects
 
         # Apply Joints
         for face in newFaces:
@@ -238,4 +243,4 @@ class NesterCommand(Fusion360CommandBase.Fusion360CommandBase):
         spacingInput = inputs.addValueInput(command.parentCommandDefinition.id + '_spacing', 'Component Spacing',
                                             unitsMgr.defaultLengthUnits,
                                                 adsk.core.ValueInput.createByReal(2.54))
-        createSubAssyInput = inputs.addBoolValueInput(command.parentCommandDefinition.id + '_subAssy', "Create Sub-Assembly", True)
+        # createSubAssyInput = inputs.addBoolValueInput(command.parentCommandDefinition.id + '_subAssy', "Create Sub-Assembly", True)
