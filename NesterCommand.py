@@ -91,14 +91,17 @@ def createJoint(face1, face2):
     if face1.assemblyContext == face2.assemblyContext:
         ui.messageBox("Faces are from the same Component.  Each part must be a component")
         adsk.terminate()
+        return False
 
     elif not face2.assemblyContext:
         ui.messageBox("Face is from the root component.  Each part must be a component")
         adsk.terminate()
+        return False
 
     elif not face1.assemblyContext:
         ui.messageBox("Face is from the root component.  Each part must be a component")
         adsk.terminate()
+        return False
 
     else:
         # Create the joint geometry
@@ -112,6 +115,8 @@ def createJoint(face1, face2):
 
         # Create the joint
         joints.add(jointInput)
+
+        return True
 
 # Returns a normalized vector in positive XYZ space from a given edge
 def getPositiveUnitVectorFromEdge(edge):
@@ -150,6 +155,7 @@ def transformAlongVector(select, directionVector, magnatude):
     vector.scaleBy(magnatude)
 
     # Create a transform to do move
+    if select is None or select.assemblyContext is None: return
     transform = adsk.core.Matrix3D.cast(select.assemblyContext.transform)
     newTransform = adsk.core.Matrix3D.create()
     newTransform.translation = vector
@@ -218,7 +224,7 @@ class NesterCommand(Fusion360CommandBase.Fusion360CommandBase):
 
         # Apply Joints
         for face in newFaces:
-            createJoint(face, plane)
+            if not createJoint(face, plane): return
 
         # Arrange Components
         arrangeComponents(newFaces, plane, edge, spacing)
